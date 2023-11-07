@@ -33,7 +33,9 @@ public class EvidenceEntity extends BaseEntity {
   private Date collectionDate;
 
   @NotNull(message = "El caso asociado a la evidencia no puede ser nulo.")
-  @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+  private Long idCase;
+
+  @ManyToOne(fetch = FetchType.EAGER, cascade = { CascadeType.PERSIST, CascadeType.MERGE })
   @JoinColumn(name = "case_id", referencedColumnName = "id", foreignKey = @ForeignKey(name = "fk_evidence_case"))
   private CaseEntity caseId;
 }

@@ -34,19 +34,19 @@ public class CaseController {
 
   @PostMapping("")
   @Transactional
-  public ResponseEntity<?> createCase(@Valid @RequestBody CaseEntity caseEntity, BindingResult bindingResult) {
+  public ResponseEntity<?> createCase(@Valid @RequestBody CaseEntity object, BindingResult bindingResult) {
     if (bindingResult.hasErrors()) {
       return ApiResponseUtil.createErrorApi(HttpStatus.BAD_REQUEST, bindingResult);
     }
 
-    OfficerEntity officer = officerService.getById(caseEntity.getIdOfficer());
+    OfficerEntity officer = officerService.getById(object.getIdOfficer());
     if (officer == null) {
       return ApiResponseUtil.createErrorResponse(HttpStatus.NOT_FOUND, "El oficial no existe en la base de datos.");
     }
 
-    caseEntity.setOfficerId(officer);
-    CaseEntity createdCase = caseService.create(caseEntity);
-    return ApiResponseUtil.createSuccessResponse(HttpStatus.OK, createdCase);
+    object.setOfficerId(officer);
+    CaseEntity createdObject = caseService.create(object);
+    return ApiResponseUtil.createSuccessResponse(HttpStatus.OK, createdObject);
   }
 
   @GetMapping("")
