@@ -21,6 +21,8 @@ import lombok.Setter;
 @NoArgsConstructor
 public class VictimEntity extends Person {
   @NotNull(message = "El caso asociado a la víctima no puede ser nulo.")
+  private Long idCase;
+
   @ManyToOne(fetch = FetchType.EAGER, cascade = { CascadeType.PERSIST, CascadeType.MERGE })
   @JoinColumn(name = "case_id", referencedColumnName = "id", foreignKey = @ForeignKey(name = "fk_victim_case"))
   private CaseEntity caseId;
