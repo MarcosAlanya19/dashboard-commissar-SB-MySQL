@@ -25,6 +25,11 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class CaseEntity extends BaseEntity {
+  @NotBlank(message = "El nombre no puede estar en blanco.")
+  @Size(max = 255, message = "El nombre no puede tener más de 255 caracteres.")
+  @Column(nullable = false, length = 255)
+  private String name;
+
   @NotBlank(message = "La descripción del caso no puede estar en blanco.")
   @Column(nullable = false, columnDefinition = "TEXT")
   private String description;
@@ -39,7 +44,9 @@ public class CaseEntity extends BaseEntity {
   private String status;
 
   @NotNull(message = "El oficial del caso no puede ser nulo.")
-  @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+  private Long idOfficer;
+
+  @ManyToOne(fetch = FetchType.EAGER, cascade = { CascadeType.PERSIST, CascadeType.MERGE })
   @JoinColumn(name = "officer_id", referencedColumnName = "id", foreignKey = @ForeignKey(name = "fk_case_officer"))
   private OfficerEntity officerId;
 }

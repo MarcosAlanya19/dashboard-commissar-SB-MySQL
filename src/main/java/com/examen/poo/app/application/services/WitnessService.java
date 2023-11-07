@@ -22,7 +22,7 @@ public class WitnessService extends BaseService<WitnessEntity> {
 
       object.setName(updatedWitness.getName());
       object.setAddress(updatedWitness.getAddress());
-      object.setContact(updatedWitness.getContact());
+      object.setPhone(updatedWitness.getPhone());
 
       return witnessRepository.save(object);
     }

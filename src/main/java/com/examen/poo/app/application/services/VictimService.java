@@ -22,7 +22,7 @@ public class VictimService extends BaseService<VictimEntity> {
 
       victim.setName(updatedVictim.getName());
       victim.setAddress(updatedVictim.getAddress());
-      victim.setContact(updatedVictim.getContact());
+      victim.setPhone(updatedVictim.getPhone());
 
       return victimRepository.save(victim);
     }

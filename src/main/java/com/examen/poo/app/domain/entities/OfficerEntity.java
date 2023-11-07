@@ -1,9 +1,14 @@
 package com.examen.poo.app.domain.entities;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import com.examen.poo.app.infraestructure.shared.objectBase.Person;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -25,4 +30,8 @@ public class OfficerEntity extends Person {
   @Size(max = 20, message = "La identificación del oficial no puede tener más de 20 caracteres.")
   @Column(unique = true, length = 20)
   private String identification;
+
+  @OneToMany(mappedBy = "officerId")
+  @JsonIgnore
+  private Set<CaseEntity> cases = new HashSet<>();
 }
