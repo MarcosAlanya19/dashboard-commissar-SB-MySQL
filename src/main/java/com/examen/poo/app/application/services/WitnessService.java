@@ -14,6 +14,14 @@ public class WitnessService extends BaseService<WitnessEntity> {
   @Autowired
   WitnessRepository witnessRepository;
 
+  public WitnessEntity getByEmail(String email) {
+    return witnessRepository.findByEmail(email);
+  }
+
+  public WitnessEntity getByDni(String dni) {
+    return witnessRepository.findByDni(dni);
+  }
+
   public WitnessEntity updateWitness(Long witnessId, WitnessEntity updatedWitness) {
     Optional<WitnessEntity> existingWitness = witnessRepository.findById(witnessId);
 
@@ -22,6 +30,8 @@ public class WitnessService extends BaseService<WitnessEntity> {
 
       object.setName(updatedWitness.getName());
       object.setAddress(updatedWitness.getAddress());
+      object.setEmail(updatedWitness.getEmail());
+      object.setDni(updatedWitness.getDni());
       object.setPhone(updatedWitness.getPhone());
 
       return witnessRepository.save(object);

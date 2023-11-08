@@ -14,17 +14,28 @@ public class OfficerService extends BaseService<OfficerEntity> {
   @Autowired
   OfficerRepository officerRepository;
 
+  public OfficerEntity getByEmail(String email) {
+    return officerRepository.findByEmail(email);
+  }
+
+  public OfficerEntity getByDni(String dni) {
+    return officerRepository.findByDni(dni);
+  }
+
   public OfficerEntity updateOfficer(Long officerId, OfficerEntity updatedOfficer) {
     Optional<OfficerEntity> existingOfficer = officerRepository.findById(officerId);
 
     if (existingOfficer.isPresent()) {
-      OfficerEntity officer = existingOfficer.get();
+      OfficerEntity object = existingOfficer.get();
 
-      officer.setName(updatedOfficer.getName());
-      officer.setOfficerRank(updatedOfficer.getOfficerRank());
-      officer.setIdentification(updatedOfficer.getIdentification());
+      object.setName(updatedOfficer.getName());
+      object.setAddress(updatedOfficer.getAddress());
+      object.setEmail(updatedOfficer.getEmail());
+      object.setDni(updatedOfficer.getDni());
+      object.setPhone(updatedOfficer.getPhone());
+      object.setOfficerRank(updatedOfficer.getOfficerRank());
 
-      return officerRepository.save(officer);
+      return officerRepository.save(object);
     }
     return null;
   }

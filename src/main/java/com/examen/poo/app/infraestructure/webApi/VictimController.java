@@ -37,26 +37,36 @@ public class VictimController {
   @Transactional
   public ResponseEntity<?> createVictim(@Valid @RequestBody VictimEntity object, BindingResult bindingResult) {
     if (bindingResult.hasErrors()) {
-      return ApiResponseUtil.createErrorApi(HttpStatus.BAD_REQUEST, bindingResult);
+      return ApiResponseUtil.responseError(HttpStatus.BAD_REQUEST, bindingResult);
     }
 
     CaseEntity cases = caseService.getById(object.getIdCase());
     if (cases == null) {
-      return ApiResponseUtil.createErrorResponse(HttpStatus.NOT_FOUND, "El caso no existe en la base de datos.");
+      return ApiResponseUtil.responseApi(HttpStatus.NOT_FOUND, "El caso no existe en la base de datos.");
+    }
+
+    VictimEntity existingVictimByDNI = victimService.getByDni(object.getDni());
+    if (existingVictimByDNI != null) {
+      return ApiResponseUtil.responseApi(HttpStatus.BAD_REQUEST, "El DNI ya está en uso.");
+    }
+
+    VictimEntity existingVictimByEmail = victimService.getByEmail(object.getEmail());
+    if (existingVictimByEmail != null) {
+      return ApiResponseUtil.responseApi(HttpStatus.BAD_REQUEST, "El email ya está en uso.");
     }
 
     object.setCaseId(cases);
     VictimEntity createdObject = victimService.create(object);
-    return ApiResponseUtil.createSuccessResponse(HttpStatus.OK, createdObject);
+    return ApiResponseUtil.responseSuccess(HttpStatus.OK, createdObject);
   }
 
   @GetMapping("")
   public ResponseEntity<?> getVictims() {
     List<VictimEntity> victims = victimService.getAll();
     if (victims.isEmpty()) {
-      return ApiResponseUtil.createErrorResponse(HttpStatus.NOT_FOUND, "No hay víctimas registradas");
+      return ApiResponseUtil.responseApi(HttpStatus.NOT_FOUND, "No hay víctimas registradas");
     } else {
-      return ApiResponseUtil.createSuccessResponse(HttpStatus.OK, victims);
+      return ApiResponseUtil.responseSuccess(HttpStatus.OK, victims);
     }
   }
 
@@ -66,42 +76,52 @@ public class VictimController {
     if (victim == null) {
       return ResponseEntity.notFound().build();
     }
-    return ApiResponseUtil.createSuccessResponse(HttpStatus.OK, victim);
+    return ApiResponseUtil.responseSuccess(HttpStatus.OK, victim);
   }
 
   @PutMapping("{id}")
   public ResponseEntity<?> putVictimById(@PathVariable Long id, @Valid @RequestBody VictimEntity object,
       BindingResult bindingResult) {
     if (bindingResult.hasErrors()) {
-      return ApiResponseUtil.createErrorApi(HttpStatus.BAD_REQUEST, bindingResult);
+      return ApiResponseUtil.responseError(HttpStatus.BAD_REQUEST, bindingResult);
     }
 
     VictimEntity existingVictim = victimService.getById(id);
     if (existingVictim == null) {
-      return ApiResponseUtil.createErrorResponse(HttpStatus.NOT_FOUND,
+      return ApiResponseUtil.responseApi(HttpStatus.NOT_FOUND,
           "No se encontró evidencia con el ID proporcionado.");
     }
 
     CaseEntity existingCase = caseService.getById(object.getIdCase());
     if (existingCase == null) {
-      return ApiResponseUtil.createErrorResponse(HttpStatus.NOT_FOUND, "El caso no existe en la base de datos.");
+      return ApiResponseUtil.responseApi(HttpStatus.NOT_FOUND, "El caso no existe en la base de datos.");
+    }
+
+    VictimEntity existingVictimByDNI = victimService.getByDni(object.getDni());
+    if (existingVictimByDNI != null && !existingVictimByDNI.getId().equals(id)) {
+      return ApiResponseUtil.responseApi(HttpStatus.BAD_REQUEST, "El DNI ya está en uso.");
+    }
+
+    VictimEntity existingVictimByEmail = victimService.getByEmail(object.getEmail());
+    if (existingVictimByEmail != null && !existingVictimByEmail.getId().equals(id)) {
+      return ApiResponseUtil.responseApi(HttpStatus.BAD_REQUEST, "El email ya está en uso.");
     }
 
     VictimEntity updatedVictim = victimService.updateVictim(id, existingVictim);
     if (updatedVictim == null) {
-      return ApiResponseUtil.createErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR,
+      return ApiResponseUtil.responseApi(HttpStatus.INTERNAL_SERVER_ERROR,
           "No se pudo actualizar la victima");
     }
 
-    return ApiResponseUtil.createSuccessResponse(HttpStatus.OK, updatedVictim);
+    return ApiResponseUtil.responseSuccess(HttpStatus.OK, updatedVictim);
   }
 
   @DeleteMapping("{id}")
   public ResponseEntity<?> deleteVictimById(@PathVariable Long id) {
     boolean deleted = victimService.deleteById(id);
     if (deleted) {
-      return ApiResponseUtil.createSuccessResponse(HttpStatus.NO_CONTENT, "Víctima eliminada con éxito");
+      return ApiResponseUtil.responseSuccess(HttpStatus.NO_CONTENT, "Víctima eliminada con éxito");
     }
-    return ApiResponseUtil.createErrorResponse(HttpStatus.NOT_FOUND, "No se pudo encontrar la víctima para eliminar");
+    return ApiResponseUtil.responseApi(HttpStatus.NOT_FOUND, "No se pudo encontrar la víctima para eliminar");
   }
 }

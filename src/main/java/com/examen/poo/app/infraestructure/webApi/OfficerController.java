@@ -30,20 +30,30 @@ public class OfficerController {
   @PostMapping("")
   public ResponseEntity<?> createOfficer(@Valid @RequestBody OfficerEntity object, BindingResult bindingResult) {
     if (bindingResult.hasErrors()) {
-      return ApiResponseUtil.createErrorApi(HttpStatus.BAD_REQUEST, bindingResult);
+      return ApiResponseUtil.responseError(HttpStatus.BAD_REQUEST, bindingResult);
+    }
+
+    OfficerEntity existingOfficer = officerService.getByEmail(object.getEmail());
+    if (existingOfficer != null) {
+      return ApiResponseUtil.responseApi(HttpStatus.BAD_REQUEST, "El email ya está registrado.");
+    }
+
+    existingOfficer = officerService.getByDni(object.getDni());
+    if (existingOfficer != null) {
+      return ApiResponseUtil.responseApi(HttpStatus.BAD_REQUEST, "El DNI ya está registrado.");
     }
 
     OfficerEntity createdOfficer = officerService.create(object);
-    return ApiResponseUtil.createSuccessResponse(HttpStatus.OK, createdOfficer);
+    return ApiResponseUtil.responseSuccess(HttpStatus.OK, createdOfficer);
   }
 
   @GetMapping("")
   public ResponseEntity<?> getOfficer() {
     List<OfficerEntity> officers = officerService.getAll();
     if (officers.isEmpty()) {
-      return ApiResponseUtil.createErrorResponse(HttpStatus.NOT_FOUND, "No hay oficiales registrados");
+      return ApiResponseUtil.responseApi(HttpStatus.NOT_FOUND, "No hay oficiales registrados");
     } else {
-      return ApiResponseUtil.createSuccessResponse(HttpStatus.OK, officers);
+      return ApiResponseUtil.responseSuccess(HttpStatus.OK, officers);
     }
   }
 
@@ -51,34 +61,45 @@ public class OfficerController {
   public ResponseEntity<?> getOfficerById(@PathVariable Long id) {
     OfficerEntity officer = officerService.getById(id);
     if (officer == null) {
-      return ApiResponseUtil.createErrorResponse(HttpStatus.NOT_FOUND,
+      return ApiResponseUtil.responseApi(HttpStatus.NOT_FOUND,
           "No se encontró un oficial con el ID proporcionado");
     }
-    return ApiResponseUtil.createSuccessResponse(HttpStatus.OK, officer);
+    return ApiResponseUtil.responseSuccess(HttpStatus.OK, officer);
   }
 
   @PutMapping("{id}")
   public ResponseEntity<?> putOfficerById(@PathVariable Long id, @Valid @RequestBody OfficerEntity object,
       BindingResult bindingResult) {
     if (bindingResult.hasErrors()) {
-      return ApiResponseUtil.createErrorApi(HttpStatus.BAD_REQUEST, bindingResult);
+      return ApiResponseUtil.responseError(HttpStatus.BAD_REQUEST, bindingResult);
     }
 
     OfficerEntity updatedOfficer = officerService.updateOfficer(id, object);
     if (updatedOfficer == null) {
-      return ApiResponseUtil.createErrorResponse(HttpStatus.NOT_FOUND,
+      return ApiResponseUtil.responseApi(HttpStatus.NOT_FOUND,
           "No se encontró un oficial con el ID proporcionado");
     }
-    return ApiResponseUtil.createSuccessResponse(HttpStatus.OK, updatedOfficer);
+
+    OfficerEntity existingOfficerByDNI = officerService.getByDni(object.getDni());
+    if (existingOfficerByDNI != null && !existingOfficerByDNI.getId().equals(id)) {
+      return ApiResponseUtil.responseApi(HttpStatus.BAD_REQUEST, "El DNI ya está en uso.");
+    }
+
+    OfficerEntity existingOfficerByEmail = officerService.getByEmail(object.getEmail());
+    if (existingOfficerByEmail != null && !existingOfficerByEmail.getId().equals(id)) {
+      return ApiResponseUtil.responseApi(HttpStatus.BAD_REQUEST, "El email ya está en uso.");
+    }
+
+    return ApiResponseUtil.responseSuccess(HttpStatus.OK, updatedOfficer);
   }
 
   @DeleteMapping("{id}")
   public ResponseEntity<?> deleteOfficerById(@PathVariable Long id) {
     boolean deleted = officerService.deleteById(id);
     if (deleted) {
-      return ApiResponseUtil.createSuccessResponse(HttpStatus.NO_CONTENT, "Oficial eliminado con éxito");
+      return ApiResponseUtil.responseSuccess(HttpStatus.NO_CONTENT, "Oficial eliminado con éxito");
     }
-    return ApiResponseUtil.createErrorResponse(HttpStatus.NOT_FOUND,
+    return ApiResponseUtil.responseApi(HttpStatus.NOT_FOUND,
         "No se encontró un oficial con el ID proporcionado");
   }
 }

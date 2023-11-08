@@ -4,13 +4,10 @@ import java.util.Date;
 
 import com.examen.poo.app.infraestructure.shared.abstractBase.BaseEntity;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.ForeignKey;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -38,15 +35,21 @@ public class CaseEntity extends BaseEntity {
   @Column(nullable = false)
   private Date startDate;
 
-  @NotBlank(message = "El estado del caso no puede estar en blanco.")
-  @Size(max = 50, message = "El estado del caso no puede tener más de 50 caracteres.")
+  public enum StatusCase {
+    OPEN,
+    CLOSE
+  }
+
+  @Enumerated(EnumType.STRING)
   @Column(nullable = false, length = 50)
-  private String status;
+  private StatusCase status;
 
-  @NotNull(message = "El oficial del caso no puede ser nulo.")
-  private Long idOfficer;
+  // @NotNull(message = "El oficial del caso no puede ser nulo.")
+  // private Long idOfficer;
 
-  @ManyToOne(fetch = FetchType.EAGER, cascade = { CascadeType.PERSIST, CascadeType.MERGE })
-  @JoinColumn(name = "officer_id", referencedColumnName = "id", foreignKey = @ForeignKey(name = "fk_case_officer"))
-  private OfficerEntity officerId;
+  // @ManyToOne(fetch = FetchType.EAGER, cascade = { CascadeType.PERSIST,
+  // CascadeType.MERGE })
+  // @JoinColumn(name = "officer_id", referencedColumnName = "id", foreignKey =
+  // @ForeignKey(name = "fk_case_officer"))
+  // private OfficerEntity officerId;
 }

@@ -37,26 +37,26 @@ public class EvidenceController {
   @Transactional
   public ResponseEntity<?> createEvidence(@Valid @RequestBody EvidenceEntity object, BindingResult bindingResult) {
     if (bindingResult.hasErrors()) {
-      return ApiResponseUtil.createErrorApi(HttpStatus.BAD_REQUEST, bindingResult);
+      return ApiResponseUtil.responseError(HttpStatus.BAD_REQUEST, bindingResult);
     }
 
     CaseEntity cases = caseService.getById(object.getIdCase());
     if (cases == null) {
-      return ApiResponseUtil.createErrorResponse(HttpStatus.NOT_FOUND, "El caso no existe en la base de datos.");
+      return ApiResponseUtil.responseApi(HttpStatus.NOT_FOUND, "El caso no existe en la base de datos.");
     }
 
     object.setCaseId(cases);
     EvidenceEntity createdObject = evidenceService.create(object);
-    return ApiResponseUtil.createSuccessResponse(HttpStatus.OK, createdObject);
+    return ApiResponseUtil.responseSuccess(HttpStatus.OK, createdObject);
   }
 
   @GetMapping("")
   public ResponseEntity<?> getEvidence() {
     List<EvidenceEntity> evidenceList = evidenceService.getAll();
     if (evidenceList.isEmpty()) {
-      return ApiResponseUtil.createErrorResponse(HttpStatus.NOT_FOUND, "No hay evidencia registrada");
+      return ApiResponseUtil.responseApi(HttpStatus.NOT_FOUND, "No hay evidencia registrada");
     } else {
-      return ApiResponseUtil.createSuccessResponse(HttpStatus.OK, evidenceList);
+      return ApiResponseUtil.responseSuccess(HttpStatus.OK, evidenceList);
     }
   }
 
@@ -64,46 +64,46 @@ public class EvidenceController {
   public ResponseEntity<?> getEvidenceById(@PathVariable Long id) {
     EvidenceEntity evidence = evidenceService.getById(id);
     if (evidence == null) {
-      return ApiResponseUtil.createErrorResponse(HttpStatus.NOT_FOUND,
+      return ApiResponseUtil.responseApi(HttpStatus.NOT_FOUND,
           "No se encontró evidencia con el ID proporcionado");
     }
-    return ApiResponseUtil.createSuccessResponse(HttpStatus.OK, evidence);
+    return ApiResponseUtil.responseSuccess(HttpStatus.OK, evidence);
   }
 
   @PutMapping("{id}")
   public ResponseEntity<?> putEvidenceById(@PathVariable Long id, @Valid @RequestBody EvidenceEntity object,
       BindingResult bindingResult) {
     if (bindingResult.hasErrors()) {
-      return ApiResponseUtil.createErrorApi(HttpStatus.BAD_REQUEST, bindingResult);
+      return ApiResponseUtil.responseError(HttpStatus.BAD_REQUEST, bindingResult);
     }
 
     EvidenceEntity existingEvidence = evidenceService.getById(id);
     if (existingEvidence == null) {
-      return ApiResponseUtil.createErrorResponse(HttpStatus.NOT_FOUND,
+      return ApiResponseUtil.responseApi(HttpStatus.NOT_FOUND,
           "No se encontró evidencia con el ID proporcionado.");
     }
 
     CaseEntity existingCase = caseService.getById(object.getIdCase());
     if (existingCase == null) {
-      return ApiResponseUtil.createErrorResponse(HttpStatus.NOT_FOUND, "El caso no existe en la base de datos.");
+      return ApiResponseUtil.responseApi(HttpStatus.NOT_FOUND, "El caso no existe en la base de datos.");
     }
 
     EvidenceEntity updatedEvidence = evidenceService.updateEvidence(id, existingEvidence);
     if (updatedEvidence == null) {
-      return ApiResponseUtil.createErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR,
+      return ApiResponseUtil.responseApi(HttpStatus.INTERNAL_SERVER_ERROR,
           "No se pudo actualizar la evidencia");
     }
 
-    return ApiResponseUtil.createSuccessResponse(HttpStatus.OK, updatedEvidence);
+    return ApiResponseUtil.responseSuccess(HttpStatus.OK, updatedEvidence);
   }
 
   @DeleteMapping("{id}")
   public ResponseEntity<?> deleteEvidenceById(@PathVariable Long id) {
     boolean deleted = evidenceService.deleteById(id);
     if (deleted) {
-      return ApiResponseUtil.createSuccessResponse(HttpStatus.NO_CONTENT, "Evidencia eliminada con éxito");
+      return ApiResponseUtil.responseSuccess(HttpStatus.NO_CONTENT, "Evidencia eliminada con éxito");
     }
-    return ApiResponseUtil.createErrorResponse(HttpStatus.NOT_FOUND,
+    return ApiResponseUtil.responseApi(HttpStatus.NOT_FOUND,
         "No se encontró evidencia con el ID proporcionado");
   }
 }

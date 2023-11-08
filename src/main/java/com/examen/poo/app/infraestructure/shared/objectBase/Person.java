@@ -24,15 +24,15 @@ public abstract class Person extends BaseEntity {
   @Column(length = 255)
   private String address;
 
-  @Size(max = 20, message = "El contacto no puede tener más de 20 caracteres.")
-  @Column(length = 20)
+  @Size(max = 50, message = "El contacto no puede tener más de 50 caracteres.")
+  @Column(length = 50, unique = true)
   private String email;
 
-  @Size(max = 20, message = "El DNI no puede tener más de 20 caracteres.")
-  @Column(length = 20)
+  @Size(max = 8, message = "El DNI no puede tener más de 8 caracteres.")
+  @Column(length = 8, unique = true)
   private String dni;
 
-  @Size(max = 20, message = "El teléfono no puede tener más de 20 caracteres.")
-  @Column(length = 20)
+  @Size(max = 9, message = "El teléfono no puede tener más de 9 caracteres.")
+  @Column(length = 9)
   private String phone;
 }
